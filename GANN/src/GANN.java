@@ -20,7 +20,7 @@ public class GANN {
     	    nn.init();
     	    nn.train();
     	    nn.evaluateTrainingSet();
-    	    
-    		//GANN gann = new GANN();
+    	    System.out.println("First Change");
+    		GANN gann = new GANN();
     }
 }
