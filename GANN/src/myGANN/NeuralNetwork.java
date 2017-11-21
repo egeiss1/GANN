@@ -1,3 +1,5 @@
+package myGANN;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -72,7 +74,7 @@ public class NeuralNetwork extends GANN{
 		this.trainingSet = trainingAndTestSet[0];
 		this.testSet = trainingAndTestSet[1];
 		BackPropagation b = (BackPropagation) this.neuralNet.getLearningRule();
-		b.addListener(new LearningListener());
+		//b.addListener(new LearningListener());
 		b.setLearningRate(this.learningRate);	
 		b.setMaxError(this.maxError);	
 		b.setMaxIterations(this.maxIterations); 
