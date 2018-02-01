@@ -40,6 +40,24 @@ public class Population extends GeneticAlgorithm
 		return temp;
 	}
 	
+    public Chromosome[] tournamentSelection() {
+        // Create a tournament population
+        Chromosome[] tournament = new Chromosome[6];
+        // For each place in the tournament get a random individual
+        for (int i = 0; i < tournament.length; i++) {
+            int rand = (int) (Math.random() * this.chromosomes.length);
+            tournament[i] = this.chromosomes[rand];
+        }
+        // Get the fittest
+        Chromosome[] fittest = new Chromosome[2];
+        for(int j = 0; j < fittest.length; ++j )
+        {
+        		
+        }
+
+        return fittest;
+    }
+	
 	public Population crossover(Chromosome C1, Chromosome C2)
 	{
 		Population temp = new Population();
@@ -57,15 +75,32 @@ public class Population extends GeneticAlgorithm
 	
 	public Chromosome getFittest()
 	{
-		return this.rank().getChromosomeAt(0);
+		bubbleSort(this.chromosomes);
+		return this.chromosomes[0];	
 	}
+
+    public static void bubbleSort(Chromosome arr[]) 
+    {
+        int n = arr.length;
+        int k;
+        for (int m = n; m >= 0; m--) {
+            for (int i = 0; i < n - 1; i++) {
+                k = i + 1;
+                if (arr[i].getFitness() > arr[k].getFitness()) {
+                    swap(i, k, arr);
+                }
+            }
+        }
+    }
 	
-	public Population rank()
-	{
-		Population temp = new Population();
-		// TO DO Choose a sorting algorithm to sort population by fitness
-		return temp;
-	}
+    private static void swap(int i, int j, Chromosome[] arr) 
+    { 
+        Chromosome temp;
+        temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
 	
 	public String toString()
 	{

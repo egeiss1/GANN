@@ -8,7 +8,7 @@ public class GANN {
 	static int defaultChromosomeSize;
 	
 	public void runAlgorithm() {
-		String file = "/Users/EricGeiss/Desktop/iris2.txt"; //args[0]
+		String file = "/Users/EricGeiss/Desktop/GANN/datasets/iris2.txt"; //args[0]
 		int input = 4;		//Integer.parseInt(args[1]);
 		int out = 3;		//Integer.parseInt(args[2]);
 		int hidden = 15;		//Integer.parseInt(args[3]);

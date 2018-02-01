@@ -69,6 +69,8 @@ public class Chromosome extends Population
         }
 	}
 	
+
+	
 	public double randomWithRange(double min, double max)
 	{
 	   double range = (max - min) + 1;     
