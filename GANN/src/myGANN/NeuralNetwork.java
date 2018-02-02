@@ -24,7 +24,7 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.filter.normalize.NormalizeMidrange;
 import net.sf.javaml.tools.data.FileHandler;
 
-public class NeuralNetwork extends GANN{
+public class NeuralNetwork {
 	private String inputFileName;
 	private int numNetworkInputs;
 	private int numNetworkOutputs;
@@ -84,7 +84,7 @@ public class NeuralNetwork extends GANN{
 	public void train()
 	{
         this.neuralNet.learn(this.trainingSet);
-        System.out.println("Done training."); 
+        //System.out.println("Done training."); 
 	}
 	
 	public void test()

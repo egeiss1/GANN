@@ -1,13 +1,14 @@
 package myGANN;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GANN {
 	static NeuralNetwork nn;
-	static int defaultPopulationSize = 100;
-	static int defaultChromosomeSize;
+	final static int defaultPopulationSize = 100;
+	static int defaultChromosomeSize = 20;
 	
-	public void runAlgorithm() {
+	public static void runAlgorithm() {
 		String file = "/Users/EricGeiss/Desktop/GANN/datasets/iris2.txt"; //args[0]
 		int input = 4;		//Integer.parseInt(args[1]);
 		int out = 3;		//Integer.parseInt(args[2]);
@@ -27,15 +28,54 @@ public class GANN {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	    nn.train();
-	    nn.evaluateTrainingSet();
-	    defaultPopulationSize = 100;
+	    //nn.evaluateTrainingSet();
 		defaultChromosomeSize = nn.numWeights();
-		
+		System.out.println("NumWeights in NN: " + nn.numWeights());
+		Chromosome c =  new Chromosome();
+		System.out.println(c);
+		System.out.println("Fitness in GANN: " + c.getFitness());
+		System.out.println("Weights in GANN: " + Arrays.toString(nn.getWeights()));
+		nn.setWeights(c.getGenes());
+		System.out.println(c.getFitness());
+		System.out.println("Accuracy in GANN after setting weights: " + nn.getAccuracy());
+		System.out.println("Weights in GANN after setting weights: " + Arrays.toString(nn.getWeights()));
+		System.out.println("Final Fitness in GANN: " + c.getFitness());
+		System.out.println("Final Accuracy in GANN: " + nn.getAccuracy());
+		//nn.test();
+		//nn.evaluateTestingSet();
+		/*
+		GeneticAlgorithm g = new GeneticAlgorithm();
+		g.printPopulation();
+
+		double[] arr = g.evolve().getGenes();
+		nn.setWeights(arr);
+		nn.test();
+		nn.evaluateTestingSet();
+		*/
+	}
+	
+	
+	public NeuralNetwork getNn() {
+		return nn;
+	}
+
+	public void setNn(NeuralNetwork nnIn) {
+		nn = nnIn;
+	}
+	
+	public int getDefaultChromosomeSize() {
+		return defaultChromosomeSize;
+	}
+
+
+	public void setDefaultChromosomeSize(int def) {
+		defaultChromosomeSize = def;
 	}
 	
     public static void main(String[] args) throws IOException {
-    		GANN gann = new GANN();
-    		gann.runAlgorithm();
+		runAlgorithm();
     }
+
 }
