@@ -6,6 +6,9 @@ public class GeneticAlgorithm
 		static double mutationRate;
 		private int tournamentSize;
 		private boolean elitism;
+		final double lowestPossibleFitness = .99;
+		final int numEpochs = 50;
+
 		
 		public GeneticAlgorithm()
 		{
@@ -22,15 +25,15 @@ public class GeneticAlgorithm
 			mutationRate = mutRate;
 			this.tournamentSize = tournamentSize;
 			this.elitism = elitism;
-		}
-			
+		}		
+
 		public Chromosome evolve()
 		{
 			int timer=0;
 			System.out.println("Timer: " + timer);
 			System.out.println("fitest: ");
 			pop.getFittest().printChroms();
-			while(pop.getFittest().getFitness() < .97 && timer < 50)
+			while(pop.getFittest().getFitness() < lowestPossibleFitness && timer < numEpochs)
 			{
 				Population temp = new Population();
 				int elitismOffset = 0;

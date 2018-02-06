@@ -157,13 +157,13 @@ public class NeuralNetwork {
         System.out.println(average.toString());     
 	}
 	
-	public double getAccuracy()
+	public double getTrainingAccuracy()
 	{
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
     
 	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
-        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
+        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
 
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
@@ -172,7 +172,38 @@ public class NeuralNetwork {
         return average.accuracy;     
 	}
 	
-	public double getPrecision()
+	public double getTestingAccuracy()
+	{
+        Evaluation evaluation = new Evaluation();
+        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
+    
+	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
+        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
+
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
+        ConfusionMatrix confusionMatrix = evaluator.getResult();
+        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
+        return average.accuracy;     
+	}
+	
+	public double getTrainingPrecision()
+	{
+
+	        Evaluation evaluation = new Evaluation();
+	        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
+	    
+		    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
+	        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
+
+	        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
+	        ConfusionMatrix confusionMatrix = evaluator.getResult();
+	        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+	        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
+	        return average.precision;     
+	}
+	
+	public double getTestingPrecision()
 	{
 
 	        Evaluation evaluation = new Evaluation();
@@ -188,7 +219,22 @@ public class NeuralNetwork {
 	        return average.precision;     
 	}
 	
-	public double getMeanSquareError()
+	public double getTrainingMeanSquareError()
+	{
+        Evaluation evaluation = new Evaluation();
+        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
+    
+	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
+        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
+
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
+        ConfusionMatrix confusionMatrix = evaluator.getResult();
+        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
+        return average.mserror;     
+	}
+	
+	public double getTestMeanSquareError()
 	{
         Evaluation evaluation = new Evaluation();
         evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));

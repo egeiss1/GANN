@@ -6,6 +6,7 @@ import java.util.Arrays;
 public class GANN {
 	static NeuralNetwork nn;
 	final static int defaultPopulationSize = 100;
+
 	static int defaultChromosomeSize = 20;
 	
 	public static void runAlgorithm() {
@@ -39,10 +40,10 @@ public class GANN {
 		System.out.println("Weights in GANN: " + Arrays.toString(nn.getWeights()));
 		nn.setWeights(c.getGenes());
 		System.out.println(c.getFitness());
-		System.out.println("Accuracy in GANN after setting weights: " + nn.getAccuracy());
+		System.out.println("Accuracy in GANN after setting weights: " + nn.getTrainingAccuracy());
 		System.out.println("Weights in GANN after setting weights: " + Arrays.toString(nn.getWeights()));
 		System.out.println("Final Fitness in GANN: " + c.getFitness());
-		System.out.println("Final Accuracy in GANN: " + nn.getAccuracy());
+		System.out.println("Final Accuracy in GANN: " + nn.getTrainingAccuracy());
 		//nn.test();
 		//nn.evaluateTestingSet();
 		/*

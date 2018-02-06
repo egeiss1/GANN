@@ -54,19 +54,19 @@ public class Chromosome
 	public void computeFitness()
 	{
 		System.out.println("NN Weights (in GA): " + Arrays.toString(GANN.nn.getWeights()));
-		GANN.nn.setWeights(genes);
+		GANN.nn.setWeights(this.genes);
 		System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
 		System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
-		GANN.nn.train();
-		this.fitness = GANN.nn.getAccuracy();
-		System.out.println("Accuracy (in GA): " + GANN.nn.getAccuracy());
-		System.out.println("fitness (in GA): " + this.fitness);
+		GANN.nn.evaluateTrainingSet();
+		this.fitness = GANN.nn.getTrainingAccuracy();
+		System.out.println("Accuracy (in GA): " + GANN.nn.getTrainingAccuracy());
+		System.out.println("fitness (in GA): " + this.fitness);		
 		
 	}
 	
 	public double getFitness()
 	{	
-		computeFitness();
+		this.computeFitness();
 		return fitness;
 	}
 	
