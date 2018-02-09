@@ -6,15 +6,13 @@ public class GeneticAlgorithm
 		static double mutationRate;
 		private int tournamentSize;
 		private boolean elitism;
-		final double lowestPossibleFitness = .99;
-		final int numEpochs = 50;
-
 		
 		public GeneticAlgorithm()
 		{
 			this.pop = new Population();
-			mutationRate = .10;
-			this.tournamentSize = 10;
+			this.pop.initPopulation();
+			mutationRate = .9;
+			this.tournamentSize = 15;
 			this.elitism = false;
 		}
 			
@@ -22,6 +20,7 @@ public class GeneticAlgorithm
 		public GeneticAlgorithm(Population pop, int mutRate, int tournamentSize, boolean elitism)
 		{
 			this.pop = pop;
+			this.pop.initPopulation();
 			mutationRate = mutRate;
 			this.tournamentSize = tournamentSize;
 			this.elitism = elitism;
@@ -30,11 +29,12 @@ public class GeneticAlgorithm
 		public Chromosome evolve()
 		{
 			int timer=0;
-			System.out.println("Timer: " + timer);
-			System.out.println("fitest: ");
-			pop.getFittest().printChroms();
-			while(pop.getFittest().getFitness() < lowestPossibleFitness && timer < numEpochs)
+			System.out.println(pop.getFittest().getFitness());
+			while(pop.getFittest().getFitness() < GANN.lowestPossibleFitness && timer < GANN.numEpochs)
 			{
+				System.out.println("FittestChroms");
+				pop.getFittest().printChroms();
+				System.out.println("Fitness: " + pop.getFittest().getFitness());			
 				Population temp = new Population();
 				int elitismOffset = 0;
 				if(elitism)
@@ -44,30 +44,30 @@ public class GeneticAlgorithm
 				} 
 	        
 				// select and crossover
-				int counter = elitismOffset;
-				while(counter < pop.size()) 
+				while(elitismOffset < pop.size()) 
 				{
 					Chromosome[] selectedChroms = pop.tournamentSelection(tournamentSize);
 					selectedChroms = pop.crossover(selectedChroms[0], selectedChroms[1]);
-					if(counter < pop.size())
+					if(elitismOffset < pop.size())
 					{
 	            			if(Math.random() < mutationRate)
 	            				selectedChroms[0].mutate();
-	            			temp.setChromosomeAt(counter,selectedChroms[0]);
-	            			counter++;
+	            			temp.setChromosomeAt(elitismOffset,selectedChroms[0]);
+	            			elitismOffset++;
 					}
 	            
-					if(counter < pop.size())
+					if(elitismOffset < pop.size())
 					{
 	            			if(Math.random() < mutationRate)
-	            				selectedChroms[0].mutate();
-	            			temp.setChromosomeAt(counter,selectedChroms[1]);
-	            			counter++;
+	            				selectedChroms[1].mutate();
+	            			temp.setChromosomeAt(elitismOffset,selectedChroms[1]);
+	            			elitismOffset++;
 					}
 	            
 				}
 				pop = temp;
 				timer++;
+				System.out.println("Timer: " + timer);
 			}
 			return pop.getFittest();
 		}

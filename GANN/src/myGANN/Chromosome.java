@@ -7,13 +7,15 @@ public class Chromosome
 	private double[] genes;
 	private int size;
 	private double fitness;
+	final double minWeight = -2;
+	final double maxWeight = 2;
 	
 	public Chromosome()
 	{
 		this.size = GANN.defaultChromosomeSize;
 		this.fitness = 0;
 		this.genes = new double[GANN.defaultChromosomeSize];
-		initGenes();
+		//initGenes();
 	}
 	
 	public Chromosome(int chromSize)
@@ -21,7 +23,7 @@ public class Chromosome
 		this.size = chromSize;
 		this.fitness = 0;
 		this.genes = new double[chromSize];
-		initGenes();
+		//initGenes();
 	}
 		
 	public Chromosome(double[] genesArr)
@@ -53,14 +55,15 @@ public class Chromosome
 	
 	public void computeFitness()
 	{
-		System.out.println("NN Weights (in GA): " + Arrays.toString(GANN.nn.getWeights()));
+		//System.out.println("NN Weights (in GA): " + Arrays.toString(GANN.nn.getWeights()));
 		GANN.nn.setWeights(this.genes);
-		System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
-		System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
-		GANN.nn.evaluateTrainingSet();
+		//GANN.nn.train();
+		//System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
+		//System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
+		//GANN.nn.evaluateTrainingSet();
 		this.fitness = GANN.nn.getTrainingAccuracy();
-		System.out.println("Accuracy (in GA): " + GANN.nn.getTrainingAccuracy());
-		System.out.println("fitness (in GA): " + this.fitness);		
+		//System.out.println("Accuracy (in GA): " + GANN.nn.getTrainingAccuracy());
+		//System.out.println("fitness (in GA): " + this.fitness);		
 		
 	}
 	
@@ -72,18 +75,15 @@ public class Chromosome
 	
 	public void mutate()
 	{
-        for (int i = 0; i < this.genes.length; i++) {
-            if (Math.random() <= GeneticAlgorithm.mutationRate) {
-                double gene = randomWithRange(-1,1);
-                this.setGeneAt(i, gene);
-            }
-        }
+		int bitToMutate = randomIntWithRange(0, this.genes.length);
+        double gene = randomWithRange(minWeight,maxWeight);
+        this.setGeneAt(bitToMutate, gene);
 	}
 	
 	public void initGenes()
 	{
         for (int i = 0; i < this.genes.length; i++) {
-        		double gene = randomWithRange(-1,1);
+        		double gene = randomWithRange(minWeight,maxWeight);
         		this.setGeneAt(i, gene);
         }
 	}
@@ -92,7 +92,7 @@ public class Chromosome
 	{
         for (int i = 0; i < s; i++) 
         {
-               double gene = randomWithRange(-1,1);
+               double gene = randomWithRange(minWeight,maxWeight);
                this.setGeneAt(i, gene);
         }
 	}
@@ -101,6 +101,12 @@ public class Chromosome
 	{
 	   double range = max - min;     
 	   return (Math.random() * range) + min;
+	}
+	
+	public int randomIntWithRange(int min, int max)
+	{
+	   int range = max - min;     
+	   return (int)((Math.random() * range) + min);
 	}
 	
 	public String toString()
