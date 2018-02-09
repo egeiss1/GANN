@@ -1,7 +1,6 @@
 package myGANN;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class GANN {
 	static NeuralNetwork nn;
