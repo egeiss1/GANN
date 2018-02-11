@@ -15,7 +15,7 @@ public class Chromosome
 		this.size = GANN.defaultChromosomeSize;
 		this.fitness = 0;
 		this.genes = new double[GANN.defaultChromosomeSize];
-		//initGenes();
+		//initGenes(); -> Done w/ population initialization
 	}
 	
 	public Chromosome(int chromSize)
@@ -23,7 +23,7 @@ public class Chromosome
 		this.size = chromSize;
 		this.fitness = 0;
 		this.genes = new double[chromSize];
-		//initGenes();
+		initGenes();
 	}
 		
 	public Chromosome(double[] genesArr)
@@ -58,6 +58,7 @@ public class Chromosome
 		//System.out.println("NN Weights (in GA): " + Arrays.toString(GANN.nn.getWeights()));
 		GANN.nn.setWeights(this.genes);
 		//GANN.nn.train();
+		//this.genes = convertDoubleArray(GANN.nn.getWeights());
 		//System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
 		//System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
 		//GANN.nn.evaluateTrainingSet();
@@ -88,6 +89,7 @@ public class Chromosome
         }
 	}
 	
+
 	public void initGenes(int s)
 	{
         for (int i = 0; i < s; i++) 
@@ -96,6 +98,23 @@ public class Chromosome
                this.setGeneAt(i, gene);
         }
 	}
+	
+	public void setGenes(double[] arr)
+	{
+		this.genes = arr;
+	}
+	
+	
+	public double[] convertDoubleArray(Double[] arr)
+	{	
+		double[] d = new double[arr.length];
+		for(int i = 0; i < arr.length; ++i)
+		{
+			d[i] = arr[i].doubleValue();
+		}
+		return d;
+	}
+	
 	
 	public static double randomWithRange(double min, double max)
 	{
@@ -109,6 +128,12 @@ public class Chromosome
 	   return (int)((Math.random() * range) + min);
 	}
 	
+    public Chromosome copy()
+    {
+        Chromosome C = new Chromosome(this.genes);
+        return C;
+    }
+	
 	public String toString()
 	{
 		String str = "Chromosome: \n\tChromosomeSize: " + this.size + "\n\tfitness: " + this.fitness
@@ -116,7 +141,7 @@ public class Chromosome
 		return str;
 	}
 	
-	public void printChroms()
+	public void printGenes()
 	{
 		System.out.println(Arrays.toString(this.genes));
 	}

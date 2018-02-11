@@ -6,14 +6,16 @@ public class GeneticAlgorithm
 		static double mutationRate;
 		private int tournamentSize;
 		private boolean elitism;
+		private boolean tournament;
 		
 		public GeneticAlgorithm()
 		{
 			this.pop = new Population();
 			this.pop.initPopulation();
-			mutationRate = .9;
-			this.tournamentSize = 15;
-			this.elitism = false;
+			mutationRate = .8;
+			this.tournamentSize = 5;
+			this.elitism = true;
+			this.tournament = false;
 		}
 			
 			
@@ -29,11 +31,21 @@ public class GeneticAlgorithm
 		public Chromosome evolve()
 		{
 			int timer=0;
-			System.out.println(pop.getFittest().getFitness());
 			while(pop.getFittest().getFitness() < GANN.lowestPossibleFitness && timer < GANN.numEpochs)
 			{
-				System.out.println("FittestChroms");
-				pop.getFittest().printChroms();
+				/* Training:
+				   Partially train each network in the population on the training set 
+				   for a certain number of epochs
+				*/
+				for(int i = 0; i < pop.size(); ++i)
+				{
+					GANN.nn.setWeights(pop.getChromosomeAt(i).getGenes());
+					GANN.nn.train();
+					pop.getChromosomeAt(i).setGenes(convertDoubleArray(GANN.nn.getWeights()));
+				}
+
+				//System.out.println("FittestChrom:");
+				//pop.getFittest().printGenes();
 				System.out.println("Fitness: " + pop.getFittest().getFitness());			
 				Population temp = new Population();
 				int elitismOffset = 0;
@@ -43,10 +55,20 @@ public class GeneticAlgorithm
 					elitismOffset = 1;
 				} 
 	        
-				// select and crossover
+				// selection, crossover, and mutation
 				while(elitismOffset < pop.size()) 
 				{
-					Chromosome[] selectedChroms = pop.tournamentSelection(tournamentSize);
+					
+					Chromosome[] selectedChroms = new Chromosome[2];
+					if(tournament)
+					{
+						selectedChroms = pop.tournamentSelection(tournamentSize);
+					}
+					else
+					{
+						selectedChroms = pop.rouletteSelection();
+					}
+					
 					selectedChroms = pop.crossover(selectedChroms[0], selectedChroms[1]);
 					if(elitismOffset < pop.size())
 					{
@@ -65,7 +87,7 @@ public class GeneticAlgorithm
 					}
 	            
 				}
-				pop = temp;
+				pop = temp.copy();
 				timer++;
 				System.out.println("Timer: " + timer);
 			}
@@ -80,6 +102,16 @@ public class GeneticAlgorithm
 
 		public void setMutationRate(double mutRate) {
 			mutationRate = mutRate;
+		}
+		
+		public double[] convertDoubleArray(Double[] arr)
+		{	
+			double[] d = new double[arr.length];
+			for(int i = 0; i < arr.length; ++i)
+			{
+				d[i] = arr[i].doubleValue();
+			}
+			return d;
 		}
 		
 		public void printPopulation()

@@ -1,10 +1,11 @@
 package myGANN;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GANN {
 	static NeuralNetwork nn;
-	static final int defaultPopulationSize = 75;
+	static final int defaultPopulationSize = 20;
 	static int defaultChromosomeSize = 20;
 	static final double lowestPossibleFitness = .98;
 	static final int numEpochs = 500;
@@ -17,7 +18,7 @@ public class GANN {
 		int hidden = 15;		//Integer.parseInt(args[3]);
 		double lrate = .01; 		// Double.parseDouble(args[4]);
 		double maxer = .01; 			// Double.parseDouble(args[5]);
-		int maxIter = 3000;		// Integer.parseInt(args[6]);
+		int maxIter = 20;	 // Integer.parseInt(args[6]);
 		int trainingPerc = 60;		// Integer.parseInt(args[7]);
 		String delim = ",";
 		String[] classNm = {"Virginica", "Setosa", "Versicolor"};
@@ -30,38 +31,25 @@ public class GANN {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-	    //nn.train();
-	    //nn.evaluateTrainingSet();
 	    
-		defaultChromosomeSize = nn.numWeights();
-		System.out.println("NumWeights in NN: " + nn.numWeights());
+	    //nn.train();
+	    
+		defaultChromosomeSize = nn.numWeights();		
 		/*
-		Chromosome c =  new Chromosome();
-		System.out.println(c);
-		System.out.println("Fitness in GANN: " + c.getFitness());
-		System.out.println("Weights in GANN: " + Arrays.toString(nn.getWeights()));
-		nn.setWeights(c.getGenes());
-		System.out.println(c.getFitness());
-		System.out.println("Accuracy in GANN after setting weights: " + nn.getTrainingAccuracy());
-		System.out.println("Weights in GANN after setting weights: " + Arrays.toString(nn.getWeights()));
-		System.out.println("Final Fitness in GANN: " + c.getFitness());
-		System.out.println("Final Accuracy in GANN: " + nn.getTrainingAccuracy());
-		*/
-		//nn.test();
-		//nn.evaluateTestingSet();
-		
+		System.out.println("initialWeights: ");
+		System.out.println(Arrays.toString(nn.getWeights()));
+		System.out.println("initial Accuracy: " + nn.getTrainingAccuracy());
+		*/		
 		GeneticAlgorithm g = new GeneticAlgorithm();
-		//g.printPopulation();
 
 		double[] arr = g.evolve().getGenes();
 		nn.setWeights(arr);
 		nn.test();
+		System.out.println("Evaluation on Testing");
 		nn.evaluateTestingSet();
-
 	}
 	
-	
+	/*
 	public NeuralNetwork getNn() {
 		return nn;
 	}
@@ -78,9 +66,10 @@ public class GANN {
 	public void setDefaultChromosomeSize(int def) {
 		defaultChromosomeSize = def;
 	}
-	
+	*/
     public static void main(String[] args) throws IOException {
 		runAlgorithm();
+
     }
 
 }

@@ -22,6 +22,20 @@ public class Population
 	
 	public void initPopulation()
 	{
+		/*
+		 * takes weights of first run or NN and inserts them into population
+		 * It's a little bit of a hack so I left it out
+		double[] d = new double[GANN.nn.numWeights()];
+		Double[] weights = GANN.nn.getWeights();
+		
+		for(int i = 0; i < weights.length; ++i)
+		{
+			d[i] = weights[i].doubleValue();
+		}
+
+		chromosomes[0] = new Chromosome(d);
+		*/
+		
 		for(int i = 0; i < chromosomes.length; ++i)
 		{
 			chromosomes[i] = new Chromosome();
@@ -64,28 +78,58 @@ public class Population
         return fittest;
     }
     
-    public Chromosome rouletteSelection()
+    public double getPopulationFitness()
     {
-    		
-    		return null;
+    		double totalfitness = 0;
+    		for(int i = 0; i < this.chromosomes.length; ++i)
+    		{
+    			totalfitness += this.chromosomes[i].getFitness();
+    		}
+    		return totalfitness;
     }
     
-	public Chromosome[] crossover(Chromosome C1, Chromosome C2)
+    public Chromosome[] rouletteSelection()
+    {
+    		
+		Chromosome[] selectedChroms = new Chromosome[2];
+		double populationFitness = this.getPopulationFitness();
+		for(int i = 0; i < 2; ++i)
+		{
+			double rouletteWheelPosition = Math.random() * populationFitness;
+			double spinWheel = 0;
+			for (Chromosome chrom : chromosomes) {
+				spinWheel += chrom.getFitness();
+				if (spinWheel >= rouletteWheelPosition) 
+					selectedChroms[i] = chrom;
+			}
+			selectedChroms[i] = this.chromosomes[chromosomes.length - 1];  
+		}
+		return selectedChroms;
+    }
+    
+	public Chromosome[] crossover(final Chromosome C1, final Chromosome C2)
 	{
+		int p1size = C1.size();
+		int p2size = C2.size();
+		Chromosome child1 = new Chromosome(p1size);
+		Chromosome child2 = new Chromosome(p2size);
 		Chromosome[] children = new Chromosome[2];
-		int C1size = C1.size();
-		if(C1size == C2.size())
+
+		if(p1size == p2size)
 		{
 	        //Select a random crossover point
-	        int crossoverPt = (int)(Math.random() * (((C1size - 1) - 1) + 1)) + 1;
-
-	        children[0] = C1;
-	        children[1] = C2;
-	        
-	        for (int i = crossoverPt; i < C1.size(); i++) {
-	                children[0].setGeneAt(i, C2.getGeneAt(i));
-	                children[1].setGeneAt(i, C1.getGeneAt(i));
+	        int crossoverPt = (int)(Math.random() * ((p1size - 2) + 1)) + 1;
+	        for (int i = 0; i < crossoverPt; i++) {
+                child1.setGeneAt(i, C1.getGeneAt(i));
+                child2.setGeneAt(i, C2.getGeneAt(i));
 	        }
+	        
+	        for (int i = crossoverPt; i < p1size; i++) {
+	                child1.setGeneAt(i, C2.getGeneAt(i));
+	                child2.setGeneAt(i, C1.getGeneAt(i));
+	        }
+	        children[0] = child1;
+	        children[1] = child2;
 		}
 		else
 		{
@@ -193,10 +237,16 @@ public class Population
 	
     public static void swap(Chromosome[] arr, int loc1, int loc2) 
     { 
-        Chromosome temp;
+        Chromosome temp = new Chromosome();
         temp = arr[loc1];
         arr[loc1] = arr[loc2];
-        arr[loc2] = temp;
+        arr[loc2] = temp.copy();
+    }
+    
+    public Population copy()
+    {
+    		Population P = new Population(this.chromosomes);
+    		return P;
     }
     	
 	public String toString()
