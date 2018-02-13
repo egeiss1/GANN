@@ -62,7 +62,7 @@ public class Chromosome
 		//System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
 		//System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
 		//GANN.nn.evaluateTrainingSet();
-		this.fitness = GANN.nn.getTrainingAccuracy();
+		this.fitness = GANN.nn.getTrainingAccuracy() - GANN.nn.getTrainingMeanSquareError();
 		//System.out.println("Accuracy (in GA): " + GANN.nn.getTrainingAccuracy());
 		//System.out.println("fitness (in GA): " + this.fitness);		
 		

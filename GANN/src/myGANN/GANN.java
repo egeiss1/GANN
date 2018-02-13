@@ -5,24 +5,24 @@ import java.util.Arrays;
 
 public class GANN {
 	static NeuralNetwork nn;
-	static final int defaultPopulationSize = 20;
-	static int defaultChromosomeSize = 20;
-	static final double lowestPossibleFitness = .98;
+	static final int defaultPopulationSize = 10;
+	static int defaultChromosomeSize = 30;
+	static final double lowestPossibleFitness = .995;
 	static final int numEpochs = 500;
 
 	
 	public static void runAlgorithm() {
-		String file = "datasets/iris.txt"; //args[0]
-		int input = 4;		//Integer.parseInt(args[1]);
-		int out = 3;		//Integer.parseInt(args[2]);
-		int hidden = 15;		//Integer.parseInt(args[3]);
-		double lrate = .01; 		// Double.parseDouble(args[4]);
-		double maxer = .01; 			// Double.parseDouble(args[5]);
-		int maxIter = 20;	 // Integer.parseInt(args[6]);
-		int trainingPerc = 60;		// Integer.parseInt(args[7]);
+		String file = "datasets/iris.txt";
+		int input = 4;		
+		int out = 3;		
+		int hidden = 15;		
+		double lrate = .01;
+		double maxer = .01; 		
+		int maxIter = 20;	 
+		int trainingPerc = 60;		
 		String delim = ",";
 		String[] classNm = {"Virginica", "Setosa", "Versicolor"};
-    
+
 		nn = new NeuralNetwork(file, classNm, delim, input, out, 
 				hidden, lrate, maxer, maxIter, trainingPerc);
 	    try {
@@ -33,13 +33,14 @@ public class GANN {
 		}
 	    
 	    //nn.train();
-	    
+	    //nn.evaluateTrainingSet();
 		defaultChromosomeSize = nn.numWeights();		
 		/*
 		System.out.println("initialWeights: ");
 		System.out.println(Arrays.toString(nn.getWeights()));
 		System.out.println("initial Accuracy: " + nn.getTrainingAccuracy());
-		*/		
+		*/
+
 		GeneticAlgorithm g = new GeneticAlgorithm();
 
 		double[] arr = g.evolve().getGenes();
@@ -47,6 +48,7 @@ public class GANN {
 		nn.test();
 		System.out.println("Evaluation on Testing");
 		nn.evaluateTestingSet();
+		
 	}
 	
 	/*

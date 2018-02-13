@@ -15,17 +15,18 @@ public class GeneticAlgorithm
 			mutationRate = .8;
 			this.tournamentSize = 5;
 			this.elitism = true;
-			this.tournament = false;
+			this.tournament = true;
 		}
 			
 			
-		public GeneticAlgorithm(Population pop, int mutRate, int tournamentSize, boolean elitism)
+		public GeneticAlgorithm(Population pop, int mutRate, int tournamentSize, boolean elitism, boolean tournament)
 		{
 			this.pop = pop;
 			this.pop.initPopulation();
 			mutationRate = mutRate;
 			this.tournamentSize = tournamentSize;
 			this.elitism = elitism;
+			this.tournament = tournament;
 		}		
 
 		public Chromosome evolve()
