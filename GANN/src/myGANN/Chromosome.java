@@ -56,7 +56,7 @@ public class Chromosome
 	public void computeFitness()
 	{
 		GANN.nn.setWeights(this.genes);
-		this.fitness = ((GANN.nn.getTrainingAccuracy() + GANN.nn.getTrainingPrecision()) / 2.0);
+		this.fitness = GANN.nn.getTrainingAccuracy();
 	}
 	
 	public double getFitness()
