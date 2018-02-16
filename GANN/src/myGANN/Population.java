@@ -23,7 +23,7 @@ public class Population
 	public void initPopulation()
 	{
 		/*
-		 * takes weights of first run or NN and inserts them into population
+		 * takes weights of first run of NN and inserts them into population
 		 * It's a little bit of a hack so I left it out
 		double[] d = new double[GANN.nn.numWeights()];
 		Double[] weights = GANN.nn.getWeights();
@@ -62,9 +62,21 @@ public class Population
         // Create a tournament population
         Chromosome[] tournament = new Chromosome[tournamentSize];
         // For each place in the tournament get a random individual
-        for (int i = 0; i < tournament.length; i++) {
-            int rand = (int) (Math.random() * this.chromosomes.length);
-            tournament[i] = this.chromosomes[rand];
+        for (int i = 0; i < tournament.length; i++) 
+        {
+        		int rand1 = 0;
+        		int rand2 = 0;
+        		// makes sure random numbers are different
+        		while(rand1 == rand2)
+        		{
+                rand1 = (int) (Math.random() * this.chromosomes.length);
+                rand2 = (int) (Math.random() * this.chromosomes.length);
+        		}
+        		// tournament between two random individuals
+        		if(this.chromosomes[rand1].getFitness() >= this.chromosomes[rand2].getFitness())
+        			tournament[i] = this.chromosomes[rand1];
+        		else
+        			tournament[i] = this.chromosomes[rand2];
         }
         // Get the fittest
         Chromosome[] fittest = new Chromosome[2];
