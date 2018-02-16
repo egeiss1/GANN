@@ -47,6 +47,7 @@ public class GeneticAlgorithm
 				// If stopping criteria is met, break out of loop
 				fittest = pop.getFittest().getFitness();
 				System.out.println("Fitness: " + fittest);
+				
 				if(fittest > GANN.lowestPossibleFitness)
 					break;
 				
