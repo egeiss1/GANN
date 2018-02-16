@@ -7,8 +7,8 @@ public class Chromosome
 	private double[] genes;
 	private int size;
 	private double fitness;
-	final double minWeight = -2;
-	final double maxWeight = 2;
+	final double minWeight = GANN.minWeight;
+	final double maxWeight = GANN.maxWeight;
 	
 	public Chromosome()
 	{
@@ -55,17 +55,8 @@ public class Chromosome
 	
 	public void computeFitness()
 	{
-		//System.out.println("NN Weights (in GA): " + Arrays.toString(GANN.nn.getWeights()));
 		GANN.nn.setWeights(this.genes);
-		//GANN.nn.train();
-		//this.genes = convertDoubleArray(GANN.nn.getWeights());
-		//System.out.println("try to set Weights to (in GA): " + Arrays.toString(genes));
-		//System.out.println("Weights are Set to (in GA):" + Arrays.toString(GANN.nn.getWeights()));
-		//GANN.nn.evaluateTrainingSet();
-		this.fitness = GANN.nn.getTrainingAccuracy() - GANN.nn.getTrainingMeanSquareError();
-		//System.out.println("Accuracy (in GA): " + GANN.nn.getTrainingAccuracy());
-		//System.out.println("fitness (in GA): " + this.fitness);		
-		
+		this.fitness = (GANN.nn.getTrainingAccuracy() - GANN.nn.getTrainingMeanSquareError());
 	}
 	
 	public double getFitness()

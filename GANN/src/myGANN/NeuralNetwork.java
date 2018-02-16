@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.neuroph.adapters.jml.JMLDataSetConverter;
+import org.neuroph.core.Layer;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
@@ -24,9 +26,10 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.filter.normalize.NormalizeMidrange;
 import net.sf.javaml.tools.data.FileHandler;
 
-public class NeuralNetwork {
+public class NeuralNetwork 
+{
 	private String inputFileName;
-	private int numNetworkInputs;
+	private int classIndex;
 	private int numNetworkOutputs;
 	private int numHiddenNeurons;
 	private double learningRate;
@@ -39,14 +42,15 @@ public class NeuralNetwork {
 	private DataSet trainingSet;
 	private DataSet testSet;
 	private String[] classNames;
-	
-	public NeuralNetwork(String fileName, String[] classes, String delimeter, int inputs, int outputs, 
+    Evaluation evaluation = new Evaluation();
+
+	public NeuralNetwork(String fileName, String[] classes, String delimeter, int classindex, int outputs, 
 			int hiddenNeurons, double learningRate, double maxError, 
 			int maxIterations, int trainingPercentage)
 	{
 		this.inputFileName = fileName;
 		this.delimeter = delimeter;
-		this.numNetworkInputs = inputs;
+		this.classIndex = classindex;
 		this.numNetworkOutputs = outputs;
 		this.numHiddenNeurons = hiddenNeurons;
 		this.learningRate = learningRate;
@@ -62,14 +66,14 @@ public class NeuralNetwork {
 	public void init() throws IOException
 	{ 
 		this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-				this.numNetworkInputs, this.numHiddenNeurons, this.numNetworkOutputs);
-		Dataset dset = FileHandler.loadDataset(new File(this.inputFileName), this.numNetworkInputs, this.delimeter);		
+				this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+		Dataset dset = FileHandler.loadDataset(new File(this.inputFileName), this.classIndex, this.delimeter);		
 		NormalizeMidrange nrm = new NormalizeMidrange(0,1);
 		nrm.build(dset);
 		nrm.filter(dset);
-		DataSet neurophDataSet = JMLDataSetConverter.convertJMLToNeurophDataset(dset, this.numNetworkInputs, this.numNetworkOutputs);
+		DataSet neurophDataSet = JMLDataSetConverter.convertJMLToNeurophDataset(dset, this.classIndex, this.numNetworkOutputs);
 		neurophDataSet.shuffle();
-        		
+        	
 		DataSet[] trainingAndTestSet = neurophDataSet.createTrainingAndTestSubsets(this.trainingPercentage, this.testingPercentage);
 		this.trainingSet = trainingAndTestSet[0];
 		this.testSet = trainingAndTestSet[1];
@@ -79,6 +83,9 @@ public class NeuralNetwork {
 		b.setMaxError(this.maxError);	
 		b.setMaxIterations(this.maxIterations); 
 		this.neuralNet.getLearningRule().setErrorFunction(new MeanSquaredError());
+		
+        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
+	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
 	}
 	
 	public void train()
@@ -112,17 +119,12 @@ public class NeuralNetwork {
             
             System.out.print("\n");
             i++;
-            }
+       }
     }
 	
 	public void evaluateTrainingSet()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
         evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         System.out.println("Confusion matrrix:\n");
@@ -138,12 +140,7 @@ public class NeuralNetwork {
 	
 	public void evaluateTestingSet()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
         evaluation.evaluateDataSet(this.neuralNet, this.testSet);
-
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         System.out.println("Confusion matrrix:\n");
@@ -157,14 +154,27 @@ public class NeuralNetwork {
         System.out.println(average.toString());     
 	}
 	
+	public double[] getAvgTestStats()
+	{
+		double[] averageStats = new double[6];
+        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
+        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
+        ConfusionMatrix confusionMatrix = evaluator.getResult();
+        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
+        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
+        averageStats[0] = average.accuracy;
+        averageStats[1] = average.precision;
+        averageStats[2] = average.recall;        
+        averageStats[3] = average.fScore;        
+        averageStats[4] = average.mserror;
+        averageStats[5] = average.correlationCoefficient;
+        return averageStats;
+ 
+	}
+	
 	public double getTrainingAccuracy()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
         evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -174,12 +184,7 @@ public class NeuralNetwork {
 	
 	public double getTestingAccuracy()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
-        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-
+        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -189,13 +194,7 @@ public class NeuralNetwork {
 	
 	public double getTrainingPrecision()
 	{
-
-	        Evaluation evaluation = new Evaluation();
-	        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-	    
-		    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
 	        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-
 	        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
 	        ConfusionMatrix confusionMatrix = evaluator.getResult();
 	        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -204,14 +203,8 @@ public class NeuralNetwork {
 	}
 	
 	public double getTestingPrecision()
-	{
-
-	        Evaluation evaluation = new Evaluation();
-	        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-	    
-		    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
+	{	    
 	        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
-
 	        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
 	        ConfusionMatrix confusionMatrix = evaluator.getResult();
 	        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -221,12 +214,7 @@ public class NeuralNetwork {
 	
 	public double getTrainingMeanSquareError()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
         evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -236,12 +224,7 @@ public class NeuralNetwork {
 	
 	public double getTestMeanSquareError()
 	{
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-    
-	    evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(this.classNames));
         evaluation.evaluateDataSet(this.neuralNet, this.testSet);
-
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -267,7 +250,7 @@ public class NeuralNetwork {
     public int numWeights() {
     		return this.neuralNet.getWeights().length;
     }
-    
+        
     public void setWeights(double[] weightsIn)
     {
     		if(weightsIn.length == numWeights())
@@ -284,7 +267,22 @@ public class NeuralNetwork {
     {
     		return (Math.round(inputNumber * 100.0) / 100.0); 
     }
-	
+    
+	public void print() 
+	{
+		System.out.println("NeuralNet Info:");
+		System.out.println("\tFile: " + this.inputFileName);
+		System.out.println("\tDelimeter: " + this.delimeter);
+		System.out.println("\tNumber of Classes: " + this.classIndex);
+		System.out.println("\tNumber of Outputs: " + this.numNetworkOutputs);
+		System.out.println("\tNumber Hidden Neurons: " + this.numHiddenNeurons);
+		System.out.println("\tLearning Rate: " + this.learningRate);
+		System.out.println("\tMax Error: " + this.maxError);
+		System.out.println("\tMax Iterations: " + this.maxIterations);
+		System.out.println("\tTraining Percentage: " + this.trainingPercentage);
+		System.out.println("\tTesting Percentage: " + (100 - this.trainingPercentage));
+		System.out.println("\tClass Names: " + Arrays.toString(this.classNames));
+	}
     public static class LearningListener implements LearningEventListener 
     {
         @Override
@@ -303,5 +301,6 @@ public class NeuralNetwork {
             }
         }
     }
+    
     
 }

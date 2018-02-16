@@ -240,7 +240,7 @@ public class Population
         Chromosome temp = new Chromosome();
         temp = arr[loc1];
         arr[loc1] = arr[loc2];
-        arr[loc2] = temp.copy();
+        arr[loc2] = temp;
     }
     
     public Population copy()

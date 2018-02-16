@@ -3,37 +3,36 @@ package myGANN;
 public class GeneticAlgorithm
 {
 		private Population pop;
-		static double mutationRate;
+		private double mutationRate;
 		private int tournamentSize;
 		private boolean elitism;
-		private boolean tournament;
 		
 		public GeneticAlgorithm()
 		{
 			this.pop = new Population();
 			this.pop.initPopulation();
-			mutationRate = .8;
+			this.mutationRate = .8;
 			this.tournamentSize = 5;
 			this.elitism = true;
-			this.tournament = true;
 		}
 			
 			
-		public GeneticAlgorithm(Population pop, int mutRate, int tournamentSize, boolean elitism, boolean tournament)
+		public GeneticAlgorithm(Population population, double mutRate, int tournamentSize, boolean elitism)
 		{
-			this.pop = pop;
+			this.pop = population;
 			this.pop.initPopulation();
-			mutationRate = mutRate;
+			this.mutationRate = mutRate;
 			this.tournamentSize = tournamentSize;
 			this.elitism = elitism;
-			this.tournament = tournament;
 		}		
 
 		public Chromosome evolve()
 		{
 			int timer=0;
-			while(pop.getFittest().getFitness() < GANN.lowestPossibleFitness && timer < GANN.numEpochs)
+			double fittest = 0;
+			while(timer < GANN.numberOfEpochs)
 			{
+
 				/* Training:
 				   Partially train each network in the population on the training set 
 				   for a certain number of epochs
@@ -45,9 +44,12 @@ public class GeneticAlgorithm
 					pop.getChromosomeAt(i).setGenes(convertDoubleArray(GANN.nn.getWeights()));
 				}
 
-				//System.out.println("FittestChrom:");
-				//pop.getFittest().printGenes();
-				System.out.println("Fitness: " + pop.getFittest().getFitness());			
+				// If stopping criteria is met, break out of loop
+				fittest = pop.getFittest().getFitness();
+				System.out.println("Fitness: " + fittest);
+				if(fittest > GANN.lowestPossibleFitness)
+					break;
+				
 				Population temp = new Population();
 				int elitismOffset = 0;
 				if(elitism)
@@ -61,16 +63,20 @@ public class GeneticAlgorithm
 				{
 					
 					Chromosome[] selectedChroms = new Chromosome[2];
-					if(tournament)
+					if(this.tournamentSize != 0)
 					{
-						selectedChroms = pop.tournamentSelection(tournamentSize);
+						selectedChroms = pop.tournamentSelection(this.tournamentSize);
 					}
 					else
 					{
 						selectedChroms = pop.rouletteSelection();
 					}
 					
-					selectedChroms = pop.crossover(selectedChroms[0], selectedChroms[1]);
+					if(Math.random() <= GANN.crossoverPr)
+					{
+						selectedChroms = pop.crossover(selectedChroms[0], selectedChroms[1]);
+					}
+					
 					if(elitismOffset < pop.size())
 					{
 	            			if(Math.random() < mutationRate)
@@ -90,7 +96,7 @@ public class GeneticAlgorithm
 				}
 				pop = temp.copy();
 				timer++;
-				System.out.println("Timer: " + timer);
+				System.out.println("GANN Iteration: " + timer);
 			}
 			return pop.getFittest();
 		}
@@ -119,5 +125,6 @@ public class GeneticAlgorithm
 		{
 			pop.print();
 		}
+		
 					
 }
