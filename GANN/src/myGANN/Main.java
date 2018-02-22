@@ -1,11 +1,11 @@
 package myGANN;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
+
 		String file = "datasets/iris.txt";
 		String[] classNm = {"Virginica", "Setosa", "Versicolor"};
 		String delim = ",";
@@ -14,16 +14,16 @@ public class Main {
 		int hidden = 15;	
 		double lrate = .01;
 		double maxer = .01; 		
-		int maxIter = 30;	 
+		int maxIter = 20;	 
 		int trainingPercentage = 60;	
 		double mutRate = .8;
-		int tournamentSize = 0;
-		final double minWeight = -2.5;
-		final double maxWeight = 2.5;
-		int defaultPopulationSize = 200;
+		int tournamentSize = 6;
+		final double minWeight = -1.5;
+		final double maxWeight = 1.5;
+		int defaultPopulationSize = 40;
 		int defaultChromosomeSize = 30;
-		double lowestPossibleFitness = .975;
-		int numEpochs = 500;
+		double lowestPossibleFitness = .98;
+		int numEpochs = 200;
 		double crossoverProb = .8;
 		boolean elitism = false;
 		int numberOfTests = 10;
@@ -34,6 +34,7 @@ public class Main {
 		/* GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
 				double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, int minWeights, int maxWeights,
 				int defaultPopulationSize, int defaultChromosomeSize, double lowestPossibleFitness, int numEpochs, boolean elitism) */
+
 		System.out.println("");
 		long startTime;
 		long endTime;
@@ -145,6 +146,7 @@ public class Main {
 		System.out.println("\t\tAverage GANN MSError: " + GANNAvgMserror);
 		System.out.println("\t\tAverage NN CorrCoef: " + NNAvgCorrCoef);
 		System.out.println("\t\tAverage GANN CorrCoef: " + GANNAvgCorrCoef);
+
 	}
 
 }

@@ -30,6 +30,7 @@ public class GeneticAlgorithm
 		{
 			int timer=0;
 			double fittest = 0;
+			Chromosome fittestChrom = new Chromosome();
 			while(timer < GANN.numberOfEpochs)
 			{
 
@@ -47,6 +48,9 @@ public class GeneticAlgorithm
 				// If stopping criteria is met, break out of loop
 				fittest = pop.getFittest().getFitness();
 				System.out.println("Fitness: " + fittest);
+				
+				if(fittest > fittestChrom.getFitness())
+					fittestChrom = pop.getFittest();
 				
 				if(fittest > GANN.lowestPossibleFitness)
 					break;
@@ -99,7 +103,7 @@ public class GeneticAlgorithm
 				timer++;
 				System.out.println("GANN Iteration: " + timer);
 			}
-			return pop.getFittest();
+			return fittestChrom;
 		}
 
 

@@ -155,14 +155,14 @@ public class Population
 		//bubbleSort(this.chromosomes);
 		mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
 
-		return this.chromosomes[0];	
+		return this.chromosomes[this.chromosomes.length - 1];	
 	}
 	
 	public Chromosome getSecondFittest()
 	{
 		//bubbleSort(this.chromosomes);
 		mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
-		return this.chromosomes[1];	
+		return this.chromosomes[this.chromosomes.length - 2];	
 	}
 
     public void bubbleSort(Chromosome[] arr) 

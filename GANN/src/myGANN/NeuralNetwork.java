@@ -72,7 +72,7 @@ public class NeuralNetwork
 		nrm.build(dset);
 		nrm.filter(dset);
 		DataSet neurophDataSet = JMLDataSetConverter.convertJMLToNeurophDataset(dset, this.classIndex, this.numNetworkOutputs);
-		neurophDataSet.shuffle();
+		//neurophDataSet.shuffle();
         	
 		DataSet[] trainingAndTestSet = neurophDataSet.createTrainingAndTestSubsets(this.trainingPercentage, this.testingPercentage);
 		this.trainingSet = trainingAndTestSet[0];
