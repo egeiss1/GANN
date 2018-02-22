@@ -81,9 +81,11 @@ public class Population
         // Get the fittest
         Chromosome[] fittest = new Chromosome[2];
 		if(GANN.sortingAlgorithm == 0)
+			mergeSort(tournament, 0, tournament.length-1);
+		else if(GANN.sortingAlgorithm == 1)
 			bubbleSort(tournament);
 		else
-			mergeSort(tournament, 0, tournament.length-1);
+			quickSort(tournament, 0, tournament.length-1);
 
         for(int j = 0; j < fittest.length; ++j )
         {
@@ -155,9 +157,11 @@ public class Population
 	public Chromosome getFittest()
 	{
 		if(GANN.sortingAlgorithm == 0)
+			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+		else if(GANN.sortingAlgorithm == 1)
 			bubbleSort(this.chromosomes);
 		else
-			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+			quickSort(this.chromosomes, 0, this.chromosomes.length-1);
 
 		return this.chromosomes[this.chromosomes.length - 1];	
 	}
@@ -165,10 +169,12 @@ public class Population
 	public Chromosome getSecondFittest()
 	{
 		if(GANN.sortingAlgorithm == 0)
+			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+		else if(GANN.sortingAlgorithm == 1)
 			bubbleSort(this.chromosomes);
 		else
-			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
-		
+			quickSort(this.chromosomes, 0, this.chromosomes.length-1);
+
 		return this.chromosomes[this.chromosomes.length - 2];	
 	}
 
@@ -251,6 +257,33 @@ public class Population
             mergeSort(arr, m+1, r);
             // Merge the sorted halves
             merge(arr, l, m, r);
+        }
+    }
+    
+	public int partition(Chromosome[] arr, int low, int high)
+    {
+        Chromosome pvt = arr[high]; 
+        int i = (low - 1); 
+        for (int j = low; j < high; j++)
+        {
+            if (arr[j].getFitness() <= pvt.getFitness())
+            {
+                i++;
+                swap(arr, i, j);
+            }
+        }
+        swap(arr, i+1, high); 
+        return i+1;
+    }
+ 
+
+    public void quickSort(Chromosome[] arr, int low, int high)
+    {
+        if (low < high)
+        {
+            int pi = partition(arr, low, high);
+            quickSort(arr, low, pi-1);
+            quickSort(arr, pi+1, high);
         }
     }
 	

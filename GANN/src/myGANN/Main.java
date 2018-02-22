@@ -6,28 +6,28 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 
-		String file = "datasets/iris.txt";
-		String[] classNm = {"Virginica", "Setosa", "Versicolor"};
-		String delim = ",";
-		int classIndex = 4;	
-		int outputs = 3;	
-		int hidden = 15;	
-		double lrate = .01;
-		double maxer = .01; 		
-		int maxIter = 20;	 
-		int trainingPercentage = 60;	
-		double mutRate = .8;
-		int tournamentSize = 6;
-		final double minWeight = -1.5;
-		final double maxWeight = 1.5;
+		String file = "datasets/iris.txt"; // file location
+		String[] classNm = {"Virginica", "Setosa", "Versicolor"}; // class names
+		String delim = ","; // delimiter
+		int classIndex = 4;	// index of the classes
+		int outputs = 3;		// number of outputs
+		int hidden = 15;		// number of hidden neurons
+		double lrate = .01;	// learning rate for neural network
+		double maxer = .01;	// maximum error for neural network		
+		int maxIter = 20;	// max NN training iterations for each epoch of GANN
+		int trainingPercentage = 60;	// training percentage of dataset
+		double mutRate = .8;	 // mutation rate
+		int tournamentSize = 0; // enter 0 for roulette, anything else for tournament selection
+		final double minWeight = -1.5;  // min random weight initialization for GANN
+		final double maxWeight = 1.5;	// max random weight initialization for GANN
 		int defaultPopulationSize = 40;
 		int defaultChromosomeSize = 30;
-		double lowestPossibleFitness = .98;
-		int numEpochs = 200;
-		double crossoverProb = .8;
-		int sortingAlgorithm = 1; // 0 for bubble, 1 for merge
-		boolean elitism = false;
-		int numberOfTests = 10;
+		double lowestPossibleFitness = .98; // GANN Stopping Criteria: minimum fitness to stop
+		int numEpochs = 200;			// GANN Stopping Criteria: maximum number of epochs allowed for GANN
+		double crossoverProb = .8; // probability crossover will occur each iteration
+		int sortingAlgorithm = 0; // 0 for merge, 1 for bubble , 2 for quick (merge fastest/quick slowest)
+		boolean elitism = false; // If true fittest chromosome is automatically selected from population each epoch
+		int numberOfTests = 10;	
 		
 		/* NeuralNetwork(String fileName, String[] classes, String delimeter, int inputs, int outputs, 
 				int hiddenNeurons, double learningRate, double maxError, 

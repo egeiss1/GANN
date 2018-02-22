@@ -28,8 +28,6 @@ public class GANN {
 	private boolean elitism;
 	private double[] avgTestStats;
 
-
-
 	public GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
 			double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, double minWeights, double maxWeights,
 			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, int sortingAlg, boolean elitism) 
