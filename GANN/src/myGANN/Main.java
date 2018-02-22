@@ -12,25 +12,26 @@ public class Main {
 		int classIndex = 4;	// index of the classes
 		int outputs = 3;		// number of outputs
 		int hidden = 15;		// number of hidden neurons
+		String transferFunctionType = "tanh"; // sigmoid/step/linear/tanh
 		double lrate = .01;	// learning rate for neural network
 		double maxer = .01;	// maximum error for neural network		
 		int maxIter = 20;	// max NN training iterations for each epoch of GANN
 		int trainingPercentage = 60;	// training percentage of dataset
-		double mutRate = .8;	 // mutation rate
+		double mutRate = .1;	 // mutation rate
 		int tournamentSize = 0; // enter 0 for roulette, anything else for tournament selection
-		final double minWeight = -1.5;  // min random weight initialization for GANN
-		final double maxWeight = 1.5;	// max random weight initialization for GANN
-		int defaultPopulationSize = 40;
+		final double minWeight = -2.5;  // min random weight initialization for GANN
+		final double maxWeight = 2.5;	// max random weight initialization for GANN
+		int defaultPopulationSize = 50;
 		int defaultChromosomeSize = 30;
-		double lowestPossibleFitness = .98; // GANN Stopping Criteria: minimum fitness to stop
-		int numEpochs = 200;			// GANN Stopping Criteria: maximum number of epochs allowed for GANN
-		double crossoverProb = .8; // probability crossover will occur each iteration
+		double lowestPossibleFitness = .9926; // GANN Stopping Criteria: minimum fitness to stop
+		int numEpochs = 110;			// GANN Stopping Criteria: maximum number of epochs allowed for GANN
+		double crossoverProb = .90; // probability crossover will occur each iteration
 		int sortingAlgorithm = 0; // 0 for merge, 1 for bubble , 2 for quick (merge fastest/quick slowest)
-		boolean elitism = false; // If true fittest chromosome is automatically selected from population each epoch
+		boolean elitism = true; // If true fittest chromosome is automatically selected from population each epoch
 		int numberOfTests = 10;	
 		
 		/* NeuralNetwork(String fileName, String[] classes, String delimeter, int inputs, int outputs, 
-				int hiddenNeurons, double learningRate, double maxError, 
+				int hiddenNeurons, String transFuncType, double learningRate, double maxError, 
 				int maxIterations, int trainingPercentage)*/
 		/* GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
 				double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, int minWeights, int maxWeights,
@@ -77,7 +78,8 @@ public class Main {
 		{
 			System.out.println("");
 			startTime = System.nanoTime();
-			NeuralNetwork NN = new NeuralNetwork(file, classNm, delim, classIndex, outputs, hidden, lrate, maxer, 3000, trainingPercentage);
+			NeuralNetwork NN = new NeuralNetwork(file, classNm, delim, classIndex, outputs, 
+					hidden, transferFunctionType, lrate, maxer, 3000, trainingPercentage);
 			NN.init();
 			NN.train();
 			NN.test();
@@ -99,7 +101,7 @@ public class Main {
 			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			startTime = System.nanoTime();
-			GANN G = new GANN(file, classNm, delim, classIndex, outputs, hidden, lrate, maxer, maxIter, trainingPercentage, mutRate, tournamentSize,
+			GANN G = new GANN(file, classNm, delim, classIndex, outputs, hidden, transferFunctionType, lrate, maxer, maxIter, trainingPercentage, mutRate, tournamentSize,
 					minWeight, maxWeight, defaultPopulationSize, defaultChromosomeSize, lowestPossibleFitness, numEpochs, crossoverProb, sortingAlgorithm, elitism);
 			G.print();
 			avgGANNStats = G.getAvgTestStats();

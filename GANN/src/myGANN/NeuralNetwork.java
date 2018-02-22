@@ -32,6 +32,7 @@ public class NeuralNetwork
 	private int classIndex;
 	private int numNetworkOutputs;
 	private int numHiddenNeurons;
+	private String transferFunctionType;
 	private double learningRate;
 	private double maxError;
 	private int maxIterations;
@@ -45,7 +46,7 @@ public class NeuralNetwork
     Evaluation evaluation = new Evaluation();
 
 	public NeuralNetwork(String fileName, String[] classes, String delimeter, int classindex, int outputs, 
-			int hiddenNeurons, double learningRate, double maxError, 
+			int hiddenNeurons, String transferFuncType, double learningRate, double maxError, 
 			int maxIterations, int trainingPercentage)
 	{
 		this.inputFileName = fileName;
@@ -53,6 +54,7 @@ public class NeuralNetwork
 		this.classIndex = classindex;
 		this.numNetworkOutputs = outputs;
 		this.numHiddenNeurons = hiddenNeurons;
+		this.transferFunctionType = transferFuncType;
 		this.learningRate = learningRate;
 		this.maxError = maxError;
 		this.maxIterations = maxIterations;
@@ -64,9 +66,30 @@ public class NeuralNetwork
 	}
 	
 	public void init() throws IOException
-	{ 
-		this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-				this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+	{
+		switch(transferFunctionType.toLowerCase()) {
+			case "sigmoid":
+				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
+						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+				break;
+			case "linear":
+				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.LINEAR, 
+						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+				break;
+			case "tanh":
+				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, 
+						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+				break;
+			case "step":
+				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.STEP, 
+						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+				break;
+			default:
+				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
+						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+				break;
+		}
+	
 		Dataset dset = FileHandler.loadDataset(new File(this.inputFileName), this.classIndex, this.delimeter);		
 		NormalizeMidrange nrm = new NormalizeMidrange(0,1);
 		nrm.build(dset);
@@ -276,6 +299,7 @@ public class NeuralNetwork
 		System.out.println("\tNumber of Classes: " + this.classIndex);
 		System.out.println("\tNumber of Outputs: " + this.numNetworkOutputs);
 		System.out.println("\tNumber Hidden Neurons: " + this.numHiddenNeurons);
+		System.out.println("\tTransfer Function Type: " + this.transferFunctionType);
 		System.out.println("\tLearning Rate: " + this.learningRate);
 		System.out.println("\tMax Error: " + this.maxError);
 		System.out.println("\tMax Iterations: " + this.maxIterations);
@@ -283,12 +307,14 @@ public class NeuralNetwork
 		System.out.println("\tTesting Percentage: " + (100 - this.trainingPercentage));
 		System.out.println("\tClass Names: " + Arrays.toString(this.classNames));
 	}
+	
     public static class LearningListener implements LearningEventListener 
     {
         @Override
         public void handleLearningEvent(LearningEvent event) 
         {
             BackPropagation bp = (BackPropagation) event.getSource();
+            
             if (event.getEventType().equals(LearningEvent.Type.LEARNING_STOPPED)) 
             {
                 double error = bp.getTotalNetworkError();
@@ -299,6 +325,7 @@ public class NeuralNetwork
             {
                 System.out.println("Iteration: " + bp.getCurrentIteration() + " | Network error: " + bp.getTotalNetworkError());
             }
+            
         }
     }
     

@@ -29,7 +29,8 @@ public class GeneticAlgorithm
 		public Chromosome evolve()
 		{
 			int timer=0;
-			double fittest = 0;
+			double fittest = pop.getFittest().getFitness();
+			System.out.println("Initial Fitness: " + fittest);
 			Chromosome fittestChrom = new Chromosome();
 			while(timer < GANN.numberOfEpochs)
 			{

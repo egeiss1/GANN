@@ -9,6 +9,7 @@ public class GANN {
 	private int classIndex;
 	private int outputs;
 	private int hidden;
+	private String transFuncType;
 	private double lrate;
 	private double maxer;
 	private int maxIter;
@@ -28,7 +29,7 @@ public class GANN {
 	private boolean elitism;
 	private double[] avgTestStats;
 
-	public GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
+	public GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, String transferFuncType, double learningRate, 
 			double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, double minWeights, double maxWeights,
 			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, int sortingAlg, boolean elitism) 
 	{
@@ -37,7 +38,8 @@ public class GANN {
 		this.delim = delimeter;
 		this.classIndex = classIndex;		
 		this.outputs = outputs;	
-		this.hidden = hiddenNeurons;	
+		this.hidden = hiddenNeurons;
+		this.transFuncType = transferFuncType;
 		this.lrate = learningRate;
 		this.maxer = maxError; 		
 		this.maxIter = maxIterations; 
@@ -56,7 +58,7 @@ public class GANN {
 		this.avgTestStats = new double[6];
 
 		nn = new NeuralNetwork(file, classNm, delim, this.classIndex, this.outputs, 
-				hidden, lrate, maxer, maxIter, this.trainingPercentage);
+				hidden, transFuncType, lrate, maxer, maxIter, this.trainingPercentage);
 	    try {
 			nn.init();
 		} catch (IOException e) {
@@ -96,6 +98,7 @@ public class GANN {
 		System.out.println("\tClass Index: " + this.classIndex);
 		System.out.println("\tNumber Outputs: " + this.outputs);
 		System.out.println("\tNumber Hidden Neurons: " + this.hidden);
+		System.out.println("\tTransfer Function Type: " + this.transFuncType);
 		System.out.println("\tLearning Rate: " + this.lrate);
 		System.out.println("\tMax Error: " + this.maxer);
 		System.out.println("\tMax Iterations (NN): " + this.maxIter);
@@ -117,6 +120,12 @@ public class GANN {
 		System.out.println("\tStopping Fitness: " + lowestPossibleFitness);
 		System.out.println("\tMax Number Epochs (GANN): " + numberOfEpochs);
 		System.out.println("\tCrossover Probability: " + crossoverPr);
+		if(sortingAlgorithm == 0)
+			System.out.println("\tSorting Algorithm: Merge Sort");
+		else if(sortingAlgorithm == 1)
+			System.out.println("\tSorting Algorithm: Bubble Sort");
+		else
+			System.out.println("\tSorting Algorithm: Quick Sort");
 		System.out.println("\tElitism: " + elitism);
 	}
 
