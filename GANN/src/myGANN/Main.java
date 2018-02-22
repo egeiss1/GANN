@@ -25,6 +25,7 @@ public class Main {
 		double lowestPossibleFitness = .98;
 		int numEpochs = 200;
 		double crossoverProb = .8;
+		int sortingAlgorithm = 1; // 0 for bubble, 1 for merge
 		boolean elitism = false;
 		int numberOfTests = 10;
 		
@@ -33,7 +34,7 @@ public class Main {
 				int maxIterations, int trainingPercentage)*/
 		/* GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
 				double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, int minWeights, int maxWeights,
-				int defaultPopulationSize, int defaultChromosomeSize, double lowestPossibleFitness, int numEpochs, boolean elitism) */
+				int defaultPopulationSize, int defaultChromosomeSize, double lowestPossibleFitness, int numEpochs, int sortingAlg, boolean elitism) */
 
 		System.out.println("");
 		long startTime;
@@ -99,7 +100,7 @@ public class Main {
 			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			startTime = System.nanoTime();
 			GANN G = new GANN(file, classNm, delim, classIndex, outputs, hidden, lrate, maxer, maxIter, trainingPercentage, mutRate, tournamentSize,
-					minWeight, maxWeight, defaultPopulationSize, defaultChromosomeSize, lowestPossibleFitness, numEpochs, crossoverProb, elitism);
+					minWeight, maxWeight, defaultPopulationSize, defaultChromosomeSize, lowestPossibleFitness, numEpochs, crossoverProb, sortingAlgorithm, elitism);
 			G.print();
 			avgGANNStats = G.getAvgTestStats();
 			GANNSumAccuracy += avgGANNStats[0];

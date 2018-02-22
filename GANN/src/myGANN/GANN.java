@@ -24,6 +24,7 @@ public class GANN {
 	static double lowestPossibleFitness;
 	static int numberOfEpochs;
 	static double crossoverPr;
+	static int sortingAlgorithm;
 	private boolean elitism;
 	private double[] avgTestStats;
 
@@ -31,7 +32,7 @@ public class GANN {
 
 	public GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, double learningRate, 
 			double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, double minWeights, double maxWeights,
-			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, boolean elitism) 
+			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, int sortingAlg, boolean elitism) 
 	{
 		this.file = fileName;
 		this.classNm = classNames;
@@ -52,6 +53,7 @@ public class GANN {
 		lowestPossibleFitness = lowestPossFitness;
 		numberOfEpochs = numEpochs;
 		crossoverPr = crossoverProb;
+		sortingAlgorithm = sortingAlg;
 		this.elitism = elitism;
 		this.avgTestStats = new double[6];
 

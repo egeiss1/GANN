@@ -80,8 +80,10 @@ public class Population
         }
         // Get the fittest
         Chromosome[] fittest = new Chromosome[2];
-        //bubbleSort(tournament);
-        mergeSort(tournament,0,tournament.length-1);
+		if(GANN.sortingAlgorithm == 0)
+			bubbleSort(tournament);
+		else
+			mergeSort(tournament, 0, tournament.length-1);
 
         for(int j = 0; j < fittest.length; ++j )
         {
@@ -152,16 +154,21 @@ public class Population
 	
 	public Chromosome getFittest()
 	{
-		//bubbleSort(this.chromosomes);
-		mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+		if(GANN.sortingAlgorithm == 0)
+			bubbleSort(this.chromosomes);
+		else
+			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
 
 		return this.chromosomes[this.chromosomes.length - 1];	
 	}
 	
 	public Chromosome getSecondFittest()
 	{
-		//bubbleSort(this.chromosomes);
-		mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+		if(GANN.sortingAlgorithm == 0)
+			bubbleSort(this.chromosomes);
+		else
+			mergeSort(this.chromosomes, 0, this.chromosomes.length-1);
+		
 		return this.chromosomes[this.chromosomes.length - 2];	
 	}
 
