@@ -1,13 +1,24 @@
+/*
+NeuralNetwork.java
+Written by Eric Geiss
+Copyright (c) 2018
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 package myGANN;
 
-import java.io.File;
 import java.io.IOException;
-
 import java.util.Arrays;
-import java.util.List;
-
-import org.neuroph.adapters.jml.JMLDataSetConverter;
-import org.neuroph.core.Layer;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
@@ -16,53 +27,42 @@ import org.neuroph.core.learning.error.MeanSquaredError;
 import org.neuroph.eval.ClassifierEvaluator;
 import org.neuroph.eval.ErrorEvaluator;
 import org.neuroph.eval.Evaluation;
+import org.neuroph.eval.EvaluationResult;
 import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
 
-import net.sf.javaml.core.Dataset;
-import net.sf.javaml.filter.normalize.NormalizeMidrange;
-import net.sf.javaml.tools.data.FileHandler;
-
 public class NeuralNetwork 
 {
-	private String inputFileName;
-	private int classIndex;
+	private int inputs;
 	private int numNetworkOutputs;
 	private int numHiddenNeurons;
 	private String transferFunctionType;
 	private double learningRate;
 	private double maxError;
 	private int maxIterations;
-	private int trainingPercentage;
-	private int testingPercentage;
-	private String delimeter;
 	private MultiLayerPerceptron neuralNet;
 	private DataSet trainingSet;
 	private DataSet testSet;
 	private String[] classNames;
     Evaluation evaluation = new Evaluation();
 
-	public NeuralNetwork(String fileName, String[] classes, String delimeter, int classindex, int outputs, 
+	public NeuralNetwork(DataSet training, DataSet testing, String[] classes, int inputs, int outputs, 
 			int hiddenNeurons, String transferFuncType, double learningRate, double maxError, 
-			int maxIterations, int trainingPercentage)
+			int maxIterations)
 	{
-		this.inputFileName = fileName;
-		this.delimeter = delimeter;
-		this.classIndex = classindex;
+		this.inputs = inputs;
 		this.numNetworkOutputs = outputs;
 		this.numHiddenNeurons = hiddenNeurons;
 		this.transferFunctionType = transferFuncType;
 		this.learningRate = learningRate;
 		this.maxError = maxError;
 		this.maxIterations = maxIterations;
-		this.trainingPercentage = trainingPercentage;
-		this.testingPercentage = (100 - this.trainingPercentage);
 		this.classNames = classes;
-		this.trainingSet = null;
-		this.testSet = null;
+		this.trainingSet = training;
+		this.testSet = testing;
 	}
 	
 	public void init() throws IOException
@@ -70,36 +70,26 @@ public class NeuralNetwork
 		switch(transferFunctionType.toLowerCase()) {
 			case "sigmoid":
 				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+						this.inputs, this.numHiddenNeurons, this.numNetworkOutputs);
 				break;
 			case "linear":
 				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.LINEAR, 
-						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+						this.inputs, this.numHiddenNeurons, this.numNetworkOutputs);
 				break;
 			case "tanh":
 				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.TANH, 
-						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+						this.inputs, this.numHiddenNeurons, this.numNetworkOutputs);
 				break;
 			case "step":
 				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.STEP, 
-						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+						this.inputs, this.numHiddenNeurons, this.numNetworkOutputs);
 				break;
 			default:
 				this.neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-						this.classIndex, this.numHiddenNeurons, this.numNetworkOutputs);
+						this.inputs, this.numHiddenNeurons, this.numNetworkOutputs);
 				break;
 		}
 	
-		Dataset dset = FileHandler.loadDataset(new File(this.inputFileName), this.classIndex, this.delimeter);		
-		NormalizeMidrange nrm = new NormalizeMidrange(0,1);
-		nrm.build(dset);
-		nrm.filter(dset);
-		DataSet neurophDataSet = JMLDataSetConverter.convertJMLToNeurophDataset(dset, this.classIndex, this.numNetworkOutputs);
-		//neurophDataSet.shuffle();
-        	
-		DataSet[] trainingAndTestSet = neurophDataSet.createTrainingAndTestSubsets(this.trainingPercentage, this.testingPercentage);
-		this.trainingSet = trainingAndTestSet[0];
-		this.testSet = trainingAndTestSet[1];
 		BackPropagation b = (BackPropagation) this.neuralNet.getLearningRule();
 		//b.addListener(new LearningListener());
 		b.setLearningRate(this.learningRate);	
@@ -180,7 +170,8 @@ public class NeuralNetwork
 	public double[] getAvgTestStats()
 	{
 		double[] averageStats = new double[6];
-        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
+		EvaluationResult EvalResult = new EvaluationResult();
+        EvalResult = evaluation.evaluateDataSet(this.neuralNet, this.testSet);
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
@@ -189,7 +180,7 @@ public class NeuralNetwork
         averageStats[1] = average.precision;
         averageStats[2] = average.recall;        
         averageStats[3] = average.fScore;        
-        averageStats[4] = average.mserror;
+        averageStats[4] = EvalResult.getMeanSquareError();
         averageStats[5] = average.correlationCoefficient;
         return averageStats;
  
@@ -237,23 +228,30 @@ public class NeuralNetwork
 	
 	public double getTrainingMeanSquareError()
 	{
-        evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
-        ConfusionMatrix confusionMatrix = evaluator.getResult();
-        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
-        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
-        return average.mserror;     
+	    EvaluationResult EvalResult = new EvaluationResult();
+        EvalResult = evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
+        return EvalResult.getMeanSquareError();    
 	}
 	
 	public double getTestMeanSquareError()
 	{
-        evaluation.evaluateDataSet(this.neuralNet, this.testSet);
+	    EvaluationResult EvalResult = new EvaluationResult();
+        EvalResult = evaluation.evaluateDataSet(this.neuralNet, this.testSet);       
+        return EvalResult.getMeanSquareError();   
+	}
+	
+	public double getTrainingAccuracyMinusMSError()
+	{
+		EvaluationResult EvalResult = new EvaluationResult();
+        EvalResult = evaluation.evaluateDataSet(this.neuralNet, this.trainingSet);
         ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
         ConfusionMatrix confusionMatrix = evaluator.getResult();
         ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
         ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
-        return average.mserror;     
+        return (average.accuracy - EvalResult.getMeanSquareError());
 	}
+	
+	
         
     public void printClassifier() 
     {
@@ -294,17 +292,13 @@ public class NeuralNetwork
 	public void print() 
 	{
 		System.out.println("NeuralNet Info:");
-		System.out.println("\tFile: " + this.inputFileName);
-		System.out.println("\tDelimeter: " + this.delimeter);
-		System.out.println("\tNumber of Classes: " + this.classIndex);
+		System.out.println("\tNumber of Inputs: " + this.inputs);
 		System.out.println("\tNumber of Outputs: " + this.numNetworkOutputs);
 		System.out.println("\tNumber Hidden Neurons: " + this.numHiddenNeurons);
 		System.out.println("\tTransfer Function Type: " + this.transferFunctionType);
 		System.out.println("\tLearning Rate: " + this.learningRate);
 		System.out.println("\tMax Error: " + this.maxError);
 		System.out.println("\tMax Iterations: " + this.maxIterations);
-		System.out.println("\tTraining Percentage: " + this.trainingPercentage);
-		System.out.println("\tTesting Percentage: " + (100 - this.trainingPercentage));
 		System.out.println("\tClass Names: " + Arrays.toString(this.classNames));
 	}
 	
@@ -317,12 +311,14 @@ public class NeuralNetwork
             
             if (event.getEventType().equals(LearningEvent.Type.LEARNING_STOPPED)) 
             {
-                double error = bp.getTotalNetworkError();
+            		double error = bp.getTotalNetworkError();
                 System.out.println("Training completed in " + bp.getCurrentIteration() + " iterations, ");
                 System.out.println("With total error: " + round(error));
+                
             } 
             else 
             {
+            	
                 System.out.println("Iteration: " + bp.getCurrentIteration() + " | Network error: " + bp.getTotalNetworkError());
             }
             

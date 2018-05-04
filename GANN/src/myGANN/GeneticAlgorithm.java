@@ -1,37 +1,57 @@
+/*
+GeneticAlgorithm.java
+Written by Eric Geiss
+Copyright (c) 2018
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 package myGANN;
 
-public class GeneticAlgorithm
-{
+public class GeneticAlgorithm {
+	
 		private Population pop;
 		private double mutationRate;
 		private int tournamentSize;
 		private boolean elitism;
+		private boolean multiGeneMutate;
+		private double maxFitnessReached; 
 		
 		public GeneticAlgorithm()
 		{
 			this.pop = new Population();
-			this.pop.initPopulation();
 			this.mutationRate = .8;
 			this.tournamentSize = 5;
 			this.elitism = true;
+			this.multiGeneMutate = true;
+			this.maxFitnessReached = 0;
 		}
 			
-			
-		public GeneticAlgorithm(Population population, double mutRate, int tournamentSize, boolean elitism)
+		public GeneticAlgorithm(Population population, double mutRate, int tournamentSize, boolean elitism, boolean multiGeneMutation)
 		{
 			this.pop = population;
-			this.pop.initPopulation();
 			this.mutationRate = mutRate;
 			this.tournamentSize = tournamentSize;
 			this.elitism = elitism;
+			this.multiGeneMutate = multiGeneMutation;
 		}		
 
 		public Chromosome evolve()
 		{
 			int timer=0;
-			double fittest = pop.getFittest().getFitness();
-			System.out.println("Initial Fitness: " + fittest);
-			Chromosome fittestChrom = new Chromosome();
+			Chromosome fittestChrom = pop.getFittest();
+			this.maxFitnessReached = fittestChrom.getFitness();
+			System.out.println("Initial Fitness: " + this.maxFitnessReached);
+			
 			while(timer < GANN.numberOfEpochs)
 			{
 
@@ -47,13 +67,13 @@ public class GeneticAlgorithm
 				}
 
 				// If stopping criteria is met, break out of loop
-				fittest = pop.getFittest().getFitness();
-				System.out.println("Fitness: " + fittest);
+				this.maxFitnessReached = pop.getFittest().getFitness();
+				System.out.println("Fitness: " + this.maxFitnessReached);
 				
-				if(fittest > fittestChrom.getFitness())
+				if(this.maxFitnessReached > fittestChrom.getFitness())
 					fittestChrom = pop.getFittest();
 				
-				if(fittest > GANN.lowestPossibleFitness)
+				if(this.maxFitnessReached > GANN.lowestPossibleFitness)
 					break;
 				
 				Population temp = new Population();
@@ -85,16 +105,30 @@ public class GeneticAlgorithm
 					
 					if(elitismOffset < pop.size())
 					{
-	            			if(Math.random() < mutationRate)
-	            				selectedChroms[0].mutate();
+						if(multiGeneMutate) 
+						{
+            					selectedChroms[0].multipleGeneMutation();
+						}
+						else
+						{
+	            				if(Math.random() < mutationRate)
+	            					selectedChroms[0].mutate();
+						}
 	            			temp.setChromosomeAt(elitismOffset,selectedChroms[0]);
 	            			elitismOffset++;
 					}
 	            
 					if(elitismOffset < pop.size())
 					{
-	            			if(Math.random() < mutationRate)
-	            				selectedChroms[1].mutate();
+						if(multiGeneMutate) 
+						{
+            					selectedChroms[1].multipleGeneMutation();
+						}
+						else
+						{
+	            				if(Math.random() < mutationRate)
+	            					selectedChroms[1].mutate();
+						}
 	            			temp.setChromosomeAt(elitismOffset,selectedChroms[1]);
 	            			elitismOffset++;
 					}
@@ -111,7 +145,10 @@ public class GeneticAlgorithm
 		public double getMutationRate() {
 			return mutationRate;
 		}
-
+		
+		public double getMaxFitnessReached() {
+			return this.maxFitnessReached;
+		}
 
 		public void setMutationRate(double mutRate) {
 			mutationRate = mutRate;

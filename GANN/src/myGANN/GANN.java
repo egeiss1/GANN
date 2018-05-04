@@ -1,20 +1,37 @@
+/*
+GANN.java
+Written by Eric Geiss
+Copyright (c) 2018
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 package myGANN;
 
 import java.io.IOException;
-import java.util.Arrays;
+import org.neuroph.core.data.DataSet;
 
 public class GANN {
 	static NeuralNetwork nn;
-	private String file;
-	private int classIndex;
+	private GeneticAlgorithm ga;
+	private int inputs;
 	private int outputs;
 	private int hidden;
 	private String transFuncType;
 	private double lrate;
 	private double maxer;
 	private int maxIter;
-	private int trainingPercentage;
-	private String delim;
+	private DataSet trainingSet;
+	private DataSet testSet;
 	private String[] classNm;
 	static double mutationRate;
 	static int tournamentSize;
@@ -27,23 +44,24 @@ public class GANN {
 	static double crossoverPr;
 	static int sortingAlgorithm;
 	private boolean elitism;
+	private boolean multiGeneMutate;
 	private double[] avgTestStats;
+	private double maxFitnessReached;
 
-	public GANN(String fileName,  String[] classNames, String delimeter, int classIndex, int outputs, int hiddenNeurons, String transferFuncType, double learningRate, 
-			double maxError, int maxIterations, int trainingPercentage, double mutRate, int tournSize, double minWeights, double maxWeights,
-			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, int sortingAlg, boolean elitism) 
+	public GANN(DataSet training, DataSet testing, String[] classNames, int inputs, int outputs, int hiddenNeurons, String transferFuncType, double learningRate, 
+			double maxError, int maxIterations, double mutRate, int tournSize, double minWeights, double maxWeights,
+			int defaultPopSize, int defaultChromSize, double lowestPossFitness, int numEpochs, double crossoverProb, int sortingAlg, boolean elitism, boolean multiGeneMut) 
 	{
-		this.file = fileName;
+		this.trainingSet = training;
+		this.testSet = testing;
 		this.classNm = classNames;
-		this.delim = delimeter;
-		this.classIndex = classIndex;		
+		this.inputs = inputs;		
 		this.outputs = outputs;	
 		this.hidden = hiddenNeurons;
 		this.transFuncType = transferFuncType;
 		this.lrate = learningRate;
 		this.maxer = maxError; 		
 		this.maxIter = maxIterations; 
-		this.trainingPercentage = trainingPercentage;		
 		mutationRate = mutRate;
 		tournamentSize = tournSize;
 		minWeight = minWeights;
@@ -55,10 +73,11 @@ public class GANN {
 		crossoverPr = crossoverProb;
 		sortingAlgorithm = sortingAlg;
 		this.elitism = elitism;
+		this.multiGeneMutate = multiGeneMut;
 		this.avgTestStats = new double[6];
 
-		nn = new NeuralNetwork(file, classNm, delim, this.classIndex, this.outputs, 
-				hidden, transFuncType, lrate, maxer, maxIter, this.trainingPercentage);
+		nn = new NeuralNetwork(this.trainingSet, this.testSet, classNm, this.inputs, this.outputs, 
+				hidden, transFuncType, lrate, maxer, maxIter);
 	    try {
 			nn.init();
 		} catch (IOException e) {
@@ -66,19 +85,12 @@ public class GANN {
 			e.printStackTrace();
 		}
 	    
-	    //nn.train();
-	    //nn.evaluateTrainingSet();
 		defaultChromosomeSize = nn.numWeights();
-		/*
-		System.out.println("initialWeights: ");
-		System.out.println(Arrays.toString(nn.getWeights()));
-		System.out.println("initial Accuracy: " + nn.getTrainingAccuracy());
-		*/
-		
 
 		Population P = new Population();
-		GeneticAlgorithm g = new GeneticAlgorithm(P, mutationRate, tournamentSize, this.elitism);
-		double[] arr = g.evolve().getGenes();
+		ga = new GeneticAlgorithm(P, mutationRate, tournamentSize, this.elitism, this.multiGeneMutate);
+		double[] arr = ga.evolve().getGenes();
+		this.maxFitnessReached = ga.getMaxFitnessReached();
 		nn.setWeights(arr);
 		nn.test();
 		System.out.println("Evaluation on Testing");
@@ -91,24 +103,25 @@ public class GANN {
 		return this.avgTestStats;
 	}
 	
+	public double getMaxFitnessReached() {
+		return this.maxFitnessReached;
+	}
+	
 	public void print()
 	{
 		System.out.println("GANN INFO:");
-		System.out.println("\tFile: " + this.file);
-		System.out.println("\tClass Index: " + this.classIndex);
+		System.out.println("\tNumber Inputs: " + this.inputs);
 		System.out.println("\tNumber Outputs: " + this.outputs);
 		System.out.println("\tNumber Hidden Neurons: " + this.hidden);
 		System.out.println("\tTransfer Function Type: " + this.transFuncType);
 		System.out.println("\tLearning Rate: " + this.lrate);
 		System.out.println("\tMax Error: " + this.maxer);
-		System.out.println("\tMax Iterations (NN): " + this.maxIter);
-		System.out.println("\tTraining Percentage: " + this.trainingPercentage + "%");
-		System.out.println("\tTesting Percentage: " + (100 - this.trainingPercentage) + "%");
+		System.out.println("\tMax Iterations (for NN): " + this.maxIter);
 		System.out.println("\tMutation Rate: " + mutationRate);
 		if(tournamentSize > 0) 
 		{
 			System.out.println("\tSelection Algorithm: Tournament");
-			System.out.println("\tTournament Size: " +tournamentSize);
+			System.out.println("\tTournament Size: " + tournamentSize);
 		}
 		else
 		{
@@ -128,24 +141,4 @@ public class GANN {
 			System.out.println("\tSorting Algorithm: Quick Sort");
 		System.out.println("\tElitism: " + elitism);
 	}
-
-	
-	/*
-	public NeuralNetwork getNn() {
-		return nn;
-	}
-
-	public void setNn(NeuralNetwork nnIn) {
-		nn = nnIn;
-	}
-	
-	public int getDefaultChromosomeSize() {
-		return defaultChromosomeSize;
-	}
-
-
-	public void setDefaultChromosomeSize(int def) {
-		defaultChromosomeSize = def;
-	}
-	*/
 }

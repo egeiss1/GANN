@@ -1,3 +1,21 @@
+/*
+Population.java
+Written by Eric Geiss
+Copyright (c) 2018
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 package myGANN;
 
 import java.util.Arrays;
@@ -11,7 +29,7 @@ public class Population
 	{
 		this.chromosomes = new Chromosome[GANN.defaultPopulationSize];
 		this.size = chromosomes.length;
-		//this.initPopulation();
+		this.initPopulation();
 	}
 	
 	public Population(Chromosome[] chromosomes)
@@ -39,8 +57,12 @@ public class Population
 		for(int i = 0; i < chromosomes.length; ++i)
 		{
 			chromosomes[i] = new Chromosome();
-			chromosomes[i].initGenes();
 		}
+	}
+	
+	public Chromosome[] getChromosomes()
+	{
+		return this.chromosomes;
 	}
 	
 	public void setChromosomeAt(int loc, Chromosome val)
@@ -162,7 +184,7 @@ public class Population
 			bubbleSort(this.chromosomes);
 		else
 			quickSort(this.chromosomes, 0, this.chromosomes.length-1);
-
+		
 		return this.chromosomes[this.chromosomes.length - 1];	
 	}
 	
@@ -174,7 +196,7 @@ public class Population
 			bubbleSort(this.chromosomes);
 		else
 			quickSort(this.chromosomes, 0, this.chromosomes.length-1);
-
+		
 		return this.chromosomes[this.chromosomes.length - 2];	
 	}
 
